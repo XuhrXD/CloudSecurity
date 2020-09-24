@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+<title>Event Manager</title>
+<link rel="shortcut icon" href="#"/>
+<script>
+function reqJSON(method, url, data) {
+  return new Promise((resolve, reject) => {
+    let xhr = new XMLHttpRequest();
+    xhr.open(method, url, true);
+    xhr.setRequestHeader('Content-type', 'application/json');
+    xhr.responseType = 'json';
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve({status: xhr.status, data: xhr.response});
+      } else {
+	console.error("xhr with error", xhr);
+        reject({status: xhr.status, data: xhr.response});
+      }
+    };
+    xhr.onerror = () => {
+      console.error("xhr with error", xhr);
+      reject({status: xhr.status, data: xhr.response});
+    };
+    xhr.send(JSON.stringify(data));
+  });
+}
+
+function parseDate(datestr) {
+  const [y, m, d] = datestr.split('-');
+  return new Date(Number.parseInt(y), Number.parseInt(m)-1, Number.parseInt(d));
+}
+
+function createEvent() {
+  reqJSON("POST","/event", {
+   name: document.getElementById('nameInput').value,
+   date: parseDate(document.getElementById('dateInput').value),
+  })
+  .then(({status,data}) => {
+    console.log("Get a response from /event",status,data);
+    let html = '';
+    for (let event of data.events) {
+      html += `${event.name}: ${event.date}<br>`;
+    }
+    document.getElementById('events').innerHTML = html;
+  })
+  .catch(({status, data}) => {
+    console.error("Error getting /event");
+    document.getElementById('events').innerHTML = 'ERROR: ' +
+      JSON.stringify(data);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('createButton').addEventListener('click',createEvent);
+  reqJSON('GET', '/events')
+  .then(({status, data}) => {
+    // Use the *data* argument to change what we see on the page.
+    // It will look something like this:
+    console.log("Get a response from /events",status,data);
+    let html = '';
+    for (let event of data.events) {
+      html += `${event.name}: ${event.date}<br>`;
+    }
+    document.getElementById('events').innerHTML = html;
+  })
+  .catch(({status, data}) => {
+    console.error("Error getting /events");
+    document.getElementById('events').innerHTML = 'ERROR: ' +
+      JSON.stringify(data);
+  });
+});
+
+</script>
+</head>
+<body>
+<div id="events"></div>
+<Form>
+Event name:<input type="text" id="nameInput"> date: <input type="text" id="dateInput">
+</Form>
+<button id="createButton">Add Event</button>
+</body>
+</html>
+
