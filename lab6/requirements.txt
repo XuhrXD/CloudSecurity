@@ -1,0 +1,5 @@
+Flask==1.1.1
+postgresql
+postgresql-server-dev-9.6
+psycopg2==2.8.4
+python-dotenv==0.10.3

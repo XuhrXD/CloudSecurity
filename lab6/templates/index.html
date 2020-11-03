@@ -1,0 +1,22 @@
+<html>
+<head>
+<title>Haoran Xu_Cloud Security</title>
+</head>
+<body>
+<div id="main" class="mainDiv">
+  <h1>Path Count</h1>
+  <div class="container" id="table_div">
+  <table class="container" id="path_table">
+      <script>
+        var paths = JSON.parse('{{ data | safe }}');
+        let html = '<tr><th><h3>Paths</h3></th><th><h3>Count</h3></th></tr>';
+        for (let x of paths) {
+          html += '<tr><td>'+x.path+'</td><td>'+x.count+'</td></tr>';
+        }
+        document.getElementById('path_table').innerHTML = html;
+      </script>
+  </table>
+  </div>
+</div>
+</body>
+</html>
